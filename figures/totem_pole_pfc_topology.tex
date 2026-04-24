@@ -1,0 +1,61 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\usetikzlibrary{calc}
+\begin{document}
+\begin{circuitikz}[american voltages, scale=0.6, transform shape, font=\LARGE]
+\ctikzset{bipoles/diode/height=0.25}
+\ctikzset{bipoles/diode/width=0.20}
+\def\VdcHeight{8}
+\def\MosScale{0.676}
+
+% v_ac on left (vertical)
+\coordinate (VACbot) at (0, 3);
+\coordinate (VACtop) at (0, 5);
+\draw (VACbot) to[vsourcesin, l=$v_{ac}$] (VACtop);
+
+% Top wire: VACtop -> i_c -> L_c -> right leader -> FL tap
+\draw (VACtop)
+  to[short, i>^=$i_c$] ++(1, 0)
+  to[L, l=$L_c$] ++(2, 0)
+  -- ++(1, 0);
+
+% FL (MOSFETs) at x=4: flipped horizontally so gates face right
+\node[nigfete, anchor=D, bodydiode, scale=\MosScale, xscale=-\MosScale] (SFLp) at (4, \VdcHeight-1) {};
+\node[nigfete, anchor=S, bodydiode, scale=\MosScale, xscale=-\MosScale] (SFL)  at (4, 1) {};
+\draw (4, \VdcHeight) -- (SFLp.D);
+\draw (SFLp.S) -- (SFL.D);
+\draw (SFL.S) -- (4, 0);
+\coordinate (FLtap) at (4, \VdcHeight-3);
+\node[circ] at (FLtap) {};
+\node[right=30pt] at (SFLp) {$S_{FL}$};
+\node[right=30pt] at (SFL)  {$\overline{S_{FL}}$};
+\node[right=4pt, font=\large] at (FLtap) {$v_{m,FL}$};
+
+% SL (DIODES) at x=8
+\draw (8, \VdcHeight) node[circ] {}
+  to[short] ++(0, -1)
+  to[Do, invert] ++(0, -1) coordinate (DUbot);
+\coordinate (SLtap) at (8, 3);
+\draw (DUbot) -- (SLtap);
+\node[circ] at (SLtap) {};
+\draw (SLtap)
+  to[Do, invert] ++(0, -1)
+  to[short] ++(0, -1)
+  node[circ] {};
+\node[right=4pt, font=\large] at (SLtap) {$v_{m,SL}$};
+
+% AC return bottom wire
+\draw (VACbot) -- (SLtap);
+
+% Rails
+\draw (4, \VdcHeight) -- (8, \VdcHeight);
+\draw (4, 0)          -- (8, 0);
+
+% v_dc on right
+\draw (8, 0)          -- (9, 0) node[circ] {};
+\draw (8, \VdcHeight) -- (9, \VdcHeight) node[circ] {};
+\draw (9, 0) to[open, v^<=$v_{dc}$] ++(0, \VdcHeight);
+
+\end{circuitikz}
+\end{document}

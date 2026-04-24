@@ -1,0 +1,17 @@
+\documentclass[tikz,border=10pt]{standalone}
+\usepackage{tikz}
+\usepackage{circuitikz}
+\begin{document}
+\begin{circuitikz}[american voltages, scale=0.8, transform shape, font=\normalsize]
+
+% Simplified PFC model: v_ac in series with L_c in series with v_c (controlled voltage source)
+\draw (0, 0)
+  to[vsourcesin, l=$v_{ac}$] (0, 3)
+  to[short, i>^=$i_c$] ++(1, 0)
+  to[L, l=$L_c$] ++(2, 0)
+  to[short] ++(1, 0)
+  to[V, l_=$v_c$, invert] ++(0, -3)
+  -- (0, 0);
+
+\end{circuitikz}
+\end{document}
